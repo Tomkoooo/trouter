@@ -1,5 +1,5 @@
 {
-  "name": "trouter",
+  "name": "@tomkoooo/t-router",
   "version": "1.0.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -12,9 +12,17 @@
     "dev": "vite", 
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "react",
+    "router",
+    "vite",
+    "middlewere",
+    "plugin",
+    "routing",
+    "react-router"
+  ],
+  "author": "Tomkoooo",
+  "license": "MIT",
   "description": "",
   "dependencies": {
     "react": "^18.3.1",
