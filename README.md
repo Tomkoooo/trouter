@@ -40,10 +40,21 @@ const App = () => {
       redirectTo: '/login'
     }
   };
+  /*
+   or use import routes './your-route-config.json'
 
-  //or use import './your-route-config.json' 
+    {
+      "Routes" : {
+        "/": {
+          "type": "public"
+        }
+      }
+    }
 
-   const pages = import.meta.glob('./pages/**/*.{tsx,jsx}') //For the dynamical routing
+  <DynamicRouter pagesConfig={routes.Routes} pages={pages}/>
+  */
+
+   const pages = import.meta.glob('./pages/**/*.{tsx,jsx}') //Needs to be passed like this because from node_modules the package ahs no access for glob but this creates opportunitys to use it outside Vite
 
   return (
     <DynamicRouter pagesConfig={pagesConfig} pages={pages}/>
@@ -84,7 +95,7 @@ import React from 'react';
 import { useDynamicParams } from '@tomkoooo/t-router';
 
 const BlogPostPage: React.FC = () => {
-  const { id } = useDynamicParams(); //you need to use the dynamic anme you given in the braces
+  const { id } = useDynamicParams(); //you need to use the dynamic name you given in the braces
 
   return <h1>Blog Post ID: {id}</h1>;
 };
@@ -95,26 +106,19 @@ export default BlogPostPage;
 
 ### Custom Middleware
 
-You can pass a custom middleware component to the `DynamicRouter` to handle logic like authentication or redirects.
+You can pass a custom middleware component to the `DynamicRouter`.
 
 ```tsx
 import { DynamicRouter, Link } from '@tomkoooo/t-router';
 import MyCustomMiddleware from './MyCustomMiddleware';
+import routes from './routes.json'
 
 const App = () => {
-  const pagesConfig = {
-    '/home': {
-      type: 'public'
-    },
-    '/profile': {
-      type: 'private',
-      credentials: 'user.role === "admin"',
-      redirectTo: '/login'
-    }
-  };
+
+  const pages = import.meta.glob('./pages/**/*.{tsx,jsx}')
 
   return (
-    <DynamicRouter pagesConfig={pagesConfig} middlewere={MyCustomMiddleware}/>
+    <DynamicRouter pagesConfig={routes.Routes} pages={pages} middlewere={MyCustomMiddleware}/>
   );
 };
 
@@ -134,7 +138,7 @@ const App = () => {
   };
 
   return (
-    <DynamicRouter pagesConfig={pagesConfig} user={user}/>
+    <DynamicRouter pagesConfig={pagesConfig} pages={pages} user={user}/>
     {/*You can pass user object for the built-in middlewere to work with it for private routing*/}
   );
 };
@@ -177,6 +181,8 @@ const App = () => {
 ## API
 
 ### `DynamicRouter`
+
+- **`pages`** (required): All the pages in the `pages` folder.
 
 - **`pagesConfig`** (required): An object defining routes and their configurations. Each route can have a `type`, optional `credentials` condition, and a `redirectTo` URL.
   
