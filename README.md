@@ -46,7 +46,7 @@ const App = () => {
    const pages = import.meta.glob('./pages/**/*.{tsx,jsx}') //For the dynamical routing
 
   return (
-    <DynamicRouter pagesConfig={pagesConfig}/>
+    <DynamicRouter pagesConfig={pagesConfig} pages={pages}/>
     {/*There is a built-in middlewere by default that handles the pagesConfig logic, by default every route will be public, but for the user credentials to work you need to pass a user object*/}
   );
 };
