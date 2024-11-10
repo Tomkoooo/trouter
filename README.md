@@ -43,6 +43,8 @@ const App = () => {
 
   //or use import './your-route-config.json' 
 
+   const pages = import.meta.glob('./pages/**/*.{tsx,jsx}') //For the dynamical routing
+
   return (
     <DynamicRouter pagesConfig={pagesConfig}/>
     {/*There is a built-in middlewere by default that handles the pagesConfig logic, by default every route will be public, but for the user credentials to work you need to pass a user object*/}
@@ -54,7 +56,7 @@ export default App;
 
 ### Dynamic Routing
 
-`t-router` uses `import.meta.glob` to dynamically import your pages based on the file structure. Files should be placed under the `pages` directory and named `page.js`, `page.jsx`, `page.ts`, or `page.tsx`. For the root create a `page` file in the root of the `pages` directory and it will match the `/` route.
+`t-router` uses `import.meta.glob` to dynamically import your pages based on the file structure but you need to call the `glob` function and pass the reasult as pages because it's impossible to do from `node_modules` folder. Files should be placed under the `pages` directory and named `page.js`, `page.jsx`, `page.ts`, or `page.tsx`. For the root create a `page` file in the root of the `pages` directory and it will match the `/` route.
 
 Example file structure:
 
@@ -79,10 +81,10 @@ Create dynamic URls with braces. The router automaticly handles them and you can
 ```javascript
 // src/pages/blog/[id]/page.tsx
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useDynamicParams } from '@tomkoooo/t-router';
 
 const BlogPostPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); //you need to use the dynamic anme you given in the braces
+  const { id } = useDynamicParams(); //you need to use the dynamic anme you given in the braces
 
   return <h1>Blog Post ID: {id}</h1>;
 };

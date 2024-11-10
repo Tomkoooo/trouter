@@ -28,6 +28,7 @@ interface DynamicRouterProps {
   pagePath?: string;
   user?: Object | null;
   middlewere?: React.ComponentType<any>; // Optional custom middleware component
+  pages: Record<string, () => Promise<unknown>>
 }
 
 const DynamicRouter: React.FC<DynamicRouterProps> = ({
@@ -35,10 +36,8 @@ const DynamicRouter: React.FC<DynamicRouterProps> = ({
   user,
   pagesConfig,
   middlewere, // Custom middleware passed as prop
+  pages
 }) => {
-  // A fájlok dinamikus importálása globálisan, most már mind a .tsx, mind a .jsx fájlokat figyelembe vesszük
-  const pages = import.meta.glob('../pages/**/*.{js,jsx,ts,tsx}');
-
   // Az útvonalak létrehozása a fájlokból
   const pathFromFile = (filePath: string): string => {
     const cleanedPath = filePath
@@ -63,6 +62,8 @@ const DynamicRouter: React.FC<DynamicRouterProps> = ({
       component: Component,
     };
   });
+
+  console.log(routes);
 
   return (
     <Router>
