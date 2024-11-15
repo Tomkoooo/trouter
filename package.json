@@ -1,6 +1,6 @@
 {
   "name": "@tomkoooo/t-router",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
@@ -19,6 +19,7 @@
     "dev": "vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "description": "A react-router for vite with folder structure routing (both pages and api with expressJs) and middlewere support",
   "keywords": [
     "react",
     "router",
@@ -30,14 +31,15 @@
   ],
   "author": "Tomkoooo",
   "license": "MIT",
-  "description": "",
   "dependencies": {
+    "express": "^4.21.1",
     "react": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "tsup": "^8.3.5",
     "vite": "^5.4.10"
   },
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/react": "^18.3.12",
     "es-module-shims": "^1.10.1",
     "rollup-plugin-dts": "^6.1.1",

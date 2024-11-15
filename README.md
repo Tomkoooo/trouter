@@ -65,13 +65,85 @@ const App = () => {
 export default App;
 ```
 
+## Server
+
+The package provides an `ExpressJs` server with API routes as folder structure. With this setup you will be able to create API routes like in `NextJs`. For this structure follow the [example structure](#file-structure) as provided. Also on run the server will console.log the read API structure with the API routes.  
+
+Example setup with Vite:
+```javascript
+// ./server/iindex.ts
+import path from 'path';
+import {loadRoutes} from '@tomkoooo/t-router'
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PORT = process.env.PORT || 4000;
+
+// Enable CORS for all routes
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
+
+// Load API routes from 'server/api' folder
+loadRoutes(path.join(__dirname, 'api'))
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch(console.error);
+
+```
+```javascript
+// vite.config.js
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: { //this will redirect every API call to the Express server without using http:localhost:3000/api/*
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000', // Target Express server
+        changeOrigin: true, // Handles the origin to match the target
+      }
+    }
+  }
+})
+```
+
+By this you can create the API folder inside Server and then add routes like `Login/` create a exported HTTP handler in a `route.ts/js` file and you can call it like `('/api/login')`. Or also you can create dynamic endpoints with folder name between `[]` like `[test]`
+
+```javascript
+// ./server/[test]/route.ts
+import { Request, Response } from 'express';
+
+export default async (req: Request, res: Response) => {
+  const { test } = req.params;
+  // A logika itt történik, pl. adatbázis lekérdezés
+  res.json({ message: `Hello world, given params: ${test}` });
+};
+
+```
+
 ### Dynamic Routing
 
 `t-router` uses `import.meta.glob` to dynamically import your pages based on the file structure but you need to call the `glob` function and pass the reasult as pages because it's impossible to do from `node_modules` folder. Files should be placed under the `pages` directory and named `page.js`, `page.jsx`, `page.ts`, or `page.tsx`. For the root create a `page` file in the root of the `pages` directory and it will match the `/` route.
 
-Example file structure:
+#### file structure:
 
 ```
+server/
+  api/
+    login/
+      route.ts
+    [id]/
+      route.ts
+  index.ts
 src/
   pages/
     home/
