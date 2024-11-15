@@ -9,16 +9,22 @@
 
 To use `t-router` in your project, you can install it via npm or yarn.
 
+### Using pre-built templete:
+Learn more about [t-react](#https://github.com/Tomkoooo/t-router-React-template)
+```bash
+npx create-treact
+```
+
 ### Using npm:
 
 ```bash
-npm install @tomkoooo/t-router
+npm install @tomkoooo/t-router@latest
 ```
 
 ### Using yarn:
 
 ```bash
-yarn add @tomkoooo/t-router
+yarn add @tomkoooo/t-router@latest
 ```
 
 ## Usage
@@ -67,18 +73,53 @@ export default App;
 
 ## Server
 
-The package provides an `ExpressJs` server with API routes as folder structure. With this setup you will be able to create API routes like in `NextJs`. For this structure follow the [example structure](#file-structure) as provided. Also on run the server will console.log the read API structure with the API routes.  
+You can create  `ExpressJs` server with API routes as folder structure. With this setup you will be able to create API routes like in `NextJs`. For this structure follow the [example structure](#file-structure) as provided. Also on run the server will console.log the read API structure with the API routes. Becouse file reading not workin from the `node_modules` here is the `server.ts` you can setup easily:
 
 Example setup with Vite:
 ```javascript
 // ./server/iindex.ts
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
-import {loadRoutes} from '@tomkoooo/t-router'
+import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Dynamically load API routes based on filesystem structure
+const loadRoutes = async (dir: string, parentPath: string = '') => {
+  const files = await fs.readdir(dir, { withFileTypes: true });
+
+  for (const file of files) {
+    const fullPath = path.join(dir, file.name);
+    const routePath = `${parentPath}/${file.name.replace(/\.[tj]s$/, '')}`;
+
+    if (file.isDirectory()) {
+      // Recursively load files within directories
+      await loadRoutes(fullPath, routePath);
+    } else if (file.name === 'route.ts' || file.name === 'route.js') {
+      // Process only files named `route.ts` or `route.js`
+      const expressPath = `/api${parentPath.replace(/\[(\w+)\]/g, ':$1')}`; // Convert `[param]` to `:param`
+
+      // Import the route handler
+      const routeHandler = await import(fullPath);
+
+      // Apply route handler, assuming it exports a default function
+      app.use(expressPath, async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          await routeHandler.default(req, res);
+        } catch (err) {
+          next(err);
+        }
+      });
+
+      console.log(`Loaded route: [${expressPath}] -> ${fullPath}`);
+    }
+  }
+};
 
 // Enable CORS for all routes
 app.use(function (req, res, next) {
@@ -128,6 +169,26 @@ export default async (req: Request, res: Response) => {
   res.json({ message: `Hello world, given params: ${test}` });
 };
 
+```
+
+To run the server install `nodemon` so you not need to restart everytime you make changes. Then create `nodemon.json` and make a script for the server start:
+
+```json
+// nodemon.json for typescript
+{
+    "watch": ["server", "src"], 
+    "ext": "js,ts,json",         
+    "ignore": ["node_modules"],  
+    "exec": "npx tsx server/index.ts"
+  }
+// extend the scripts in package.json (start:server)
+"scripts": {
+    "start:server": "nodemon server/index.ts",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
 ```
 
 ### Dynamic Routing
